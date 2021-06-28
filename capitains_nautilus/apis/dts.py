@@ -124,8 +124,14 @@ def _hydra_dts_predicates(graph: Graph, collection: Collection, nsm: NamespaceMa
         j["dts:passage"] = url_for(".dts_document", id=collection.id, _external=_external)
         j["dts:references"] = url_for(".dts_navigation", id=collection.id, _external=_external)
 
-    for download_uri in graph.objects(collection.asNode(), RDF_NAMESPACES.DTS.term("download")):
-        j["dts:download"] = download_uri
+    download_uri_list = list(graph.objects(collection.asNode(), RDF_NAMESPACES.DTS.term("download")))
+    if len(download_uri_list) > 1:
+        j["dts:download"] = []
+        for download_uri in download_uri_list:
+            j["dts:download"].append(download_uri)
+    else:
+        for download_uri in download_uri_list:
+            j["dts:download"] = download_uri
 
     # If the system handles citation structure
     if hasattr(collection, "citation") and \

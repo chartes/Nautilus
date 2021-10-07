@@ -65,7 +65,6 @@ def _compute_extension_and_dc(o: dict, store: Subgraph,  nsm: NamespaceManager):
         k = store.graph.qname(predicate)
         prefix, namespace, name = nsm.compute_qname(predicate)
         namespace = str(namespace)
-
         # Ignore namespaces that are part of the root DTS object
         if namespace in ignore_ns:
             continue
@@ -75,7 +74,6 @@ def _compute_extension_and_dc(o: dict, store: Subgraph,  nsm: NamespaceManager):
             metadata = dublincore
         else:
             metadata = extensions
-
         if k in metadata:
             if isinstance(metadata[k], list):
                 metadata[k].append(literal_to_dict(obj))
@@ -126,12 +124,9 @@ def _hydra_dts_predicates(graph: Graph, collection: Collection, nsm: NamespaceMa
 
     download_uri_list = list(graph.objects(collection.asNode(), RDF_NAMESPACES.DTS.term("download")))
     if len(download_uri_list) > 1:
-        j["dts:download"] = []
-        for download_uri in download_uri_list:
-            j["dts:download"].append(download_uri)
-    else:
-        for download_uri in download_uri_list:
-            j["dts:download"] = download_uri
+        j["dts:download"] = download_uri_list
+    elif len(download_uri_list) == 1:
+        j["dts:download"] = download_uri_list[0]
 
     # If the system handles citation structure
     if hasattr(collection, "citation") and \
